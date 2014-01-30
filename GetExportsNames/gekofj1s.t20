@@ -1,0 +1,17 @@
+// GetExportsNames.h
+
+#pragma once
+
+#include <Windows.h>
+#include <dbghelp.h>
+
+using namespace System;
+
+namespace GetExportsNames {
+
+	public ref class Class1
+	{
+		// TODO: здесь следует добавить свои методы для этого класса.
+    bool GetDLLFileExports(char *szFileName, unsigned int *nNoOfExports, char **&pszFunctions)
+	};
+}
