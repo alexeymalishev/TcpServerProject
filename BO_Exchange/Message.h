@@ -9,7 +9,7 @@ struct Message
   uint16_t pid;
   uint8_t  flags;
   uint8_t  type;
-  uint8_t* data;
+  uint8_t  data;
 };
 #pragma pack(pop)
 

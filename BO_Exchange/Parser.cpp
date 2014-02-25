@@ -76,7 +76,8 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
             if ((state_ & PS_Error) == 0)
             {
               //TODO: here we need send error message to DB
-              parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "sinchronization filed excess data between end&start");
+              parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "synchronization filed excess data between end&start");
+              BOOST_LOG_TRIVIAL(error) << "synchronization filed excess data between end&start";
               AddAnsMessage(outbuffer, -1);
               /////////////////////////////////////////////
               state_ = PS_Error;
@@ -92,7 +93,8 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
           if (*cur_element == kStartToken_)
           {
             //TODO: here we need send error message to DB
-            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "sinchronization filed start without end");
+            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "synchronization filed start without end");
+            BOOST_LOG_TRIVIAL(error) << "synchronization filed start without end";
             AddAnsMessage(outbuffer, -1);
             /////////////////////////////////////////////
             state_ = PS_Filling;
@@ -106,7 +108,8 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
           if (state_ & PS_Token)
           {
             //TODO: here we need send error message to DB
-            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "sinchronization filed end token after '/' token");
+            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "synchronization filed end token after '/' token");
+            BOOST_LOG_TRIVIAL(error) << "synchronization filed end token after '/' token";
             AddAnsMessage(outbuffer, -1);
             /////////////////////////////////////////////
             state_ = PS_Error;
@@ -135,7 +138,8 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
           else
           {
             //TODO: here we need send error message to DB we recieve undefined token
-            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "sinchronization filed wrong token after '/'");
+            parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "synchronization filed wrong token after '/'");
+            BOOST_LOG_TRIVIAL(error) << "synchronization filed wrong token after '/'";
             AddAnsMessage(outbuffer, -1);
             /////////////////////////////////////////////
             state_ = PS_Error;
@@ -157,7 +161,8 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
     else
     {
       //TODO: here we need send error message to DB we recieve undefined message
-      parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "sinchronization filed handshake error");
+      parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "synchronization filed handshake error");
+      BOOST_LOG_TRIVIAL(error) << "synchronization filed handshake error";
       throw std::exception("Recieve undefined message, close connection.");
     }
   }
@@ -180,11 +185,13 @@ void CParser::AddAnsMessage(tcpserver::outbuffer_ptr& outbuffer, int16_t ec)
   mes->type = MT_PARAM;
   mes->protocol_version = kProtocolVersion_;
 
-  mes->data[0] = in_message_pid_ & 0xFF;
-  mes->data[1] = in_message_pid_ >> 8;
+  uint8_t* mesData = &mes->data;
 
-  mes->data[2] = ec & 0xFF;
-  mes->data[3] = ec >> 8;
+  mesData[0] = in_message_pid_ & 0xFF;
+  mesData[1] = in_message_pid_ >> 8;
+
+  mesData[2] = ec & 0xFF;
+  mesData[3] = ec >> 8;
 
   //TODO: check crc compute and function
 
@@ -196,8 +203,8 @@ void CParser::AddAnsMessage(tcpserver::outbuffer_ptr& outbuffer, int16_t ec)
 
   crc_ = ~crc_;
 
-  mes->data[message_size - 2] = crc_ & 0xFF;
-  mes->data[message_size - 1] = crc_ >> 8;
+  mesData[message_size - 2] = crc_ & 0xFF;
+  mesData[message_size - 1] = crc_ >> 8;
 } // void CParser::AddErrorMessage
 
 void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags, uint8_t code, uint8_t lenght, uint8_t const * const data)
@@ -215,11 +222,13 @@ void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags
   mes->type = MT_ANS;
   mes->protocol_version = kProtocolVersion_;
 
-  mes->data[0] = flags;
-  mes->data[1] = code;
-  mes->data[2] = lenght;
+  uint8_t* mesData = &mes->data;
 
-  memcpy(mes->data + 3, data, lenght);
+  mesData[0] = flags;
+  mesData[1] = code;
+  mesData[2] = lenght;
+
+  memcpy(mesData + 3, data, lenght);
 
   //TODO: check crc compute and function
 
@@ -231,8 +240,8 @@ void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags
 
   crc_ = ~crc_;
 
-  mes->data[message_size - 2] = crc_ & 0xFF;
-  mes->data[message_size - 1] = crc_ >> 8;
+  mesData[message_size - 2] = crc_ & 0xFF;
+  mesData[message_size - 1] = crc_ >> 8;
 
 } // void CParser::AddParamMessage
 
@@ -243,6 +252,7 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   {
     //TODO: proceed Error message size
     parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "wrong message size");
+    BOOST_LOG_TRIVIAL(error) << "wrong message size";
     AddAnsMessage(outbuffer, -1);
     //////////////////////////////////
     return;
@@ -251,7 +261,8 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   if (crc_ != kCRC_ok_)
   {
     //TODO: proceed Error crc
-    parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "crc filed");
+    parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "crc failed");
+    BOOST_LOG_TRIVIAL(error) << "crc failed";
     AddAnsMessage(outbuffer, -1);
     //////////////////////////////////
     return;
@@ -263,9 +274,9 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   {
     //TODO: proceed Error message size
     parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "wrong message size");
+    BOOST_LOG_TRIVIAL(error) << "wrong message size";
     AddAnsMessage(outbuffer, -1);
     //////////////////////////////////
-
     return;
   }
 
@@ -273,6 +284,7 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   {
     //TODO: proceed Error protocol version
     parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "wrong protocol");
+    BOOST_LOG_TRIVIAL(error) << "wrong protocol";
     AddAnsMessage(outbuffer, -1);
     //////////////////////////////////
     return;
@@ -282,6 +294,7 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   {
     //TODO: proceed Error device_id
     parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "message devices id is 0");
+    BOOST_LOG_TRIVIAL(error) << "message devices id is 0";
     AddAnsMessage(outbuffer, -1);
     //////////////////////////////////
     return;
@@ -297,47 +310,47 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
     {
       //TODO: proceed Error incompatible device_id
       parser::CDBInterface::Instance().PushLogMessage(device_id_, -1, "incoming message devices id not equal to connection device id");
+      BOOST_LOG_TRIVIAL(error) << "incoming message devices id not equal to connection device id";
       AddAnsMessage(outbuffer, -1);
       //////////////////////////////////
       return;
     }
-
-    switch (mes->type)
-    {
-    case MT_COORDS:
-    {
-                    parser::CDBInterface::Instance().PushCoordData(device_id_, mes->data);
-    }
-      break;
-    case MT_FIRMWARE:
-    {
-                      parser::CDBInterface::Instance().PushFirmwareData(device_id_, mes->data);
-
-                      //set new transmission period
-                      AddParamMessage(outbuffer, 0x08, 0x01, 2, reinterpret_cast<const uint8_t*>(&kTransmissionPeriod));
-
-    }
-      break;
-    case MT_ANS:
-    {
-                 //TODO: here must be ans message handler
-    }
-      break;
-    case MT_ACC:
-    case MT_NOP:
-    case MT_PARAM:
-    case MT_TEMP:
-    case MT_POWER:
-    case MT_DIG_INPUTS:
-    case MT_GET_MES:
-    default:
-      //TODO: proceed Error incompatible message type
-      AddAnsMessage(outbuffer, -1);
-      //////////////////////////////////
-    }
-
-    in_message_pid_ = mes->pid;
   }
+   
+  switch (mes->type)
+  {
+  case MT_COORDS:
+  {
+    parser::CDBInterface::Instance().PushCoordData(device_id_, &mes->data);
+  }
+    break;
+  case MT_FIRMWARE:
+  {
+    parser::CDBInterface::Instance().PushFirmwareData(device_id_, &mes->data);
+
+    //set new transmission period
+    AddParamMessage(outbuffer, 0x08, 0x01, 2, reinterpret_cast<const uint8_t*>(&kTransmissionPeriod));
+  }
+    break;
+  case MT_ANS:
+  {
+                //TODO: here must be ans message handler
+  }
+    break;
+  case MT_ACC:
+  case MT_NOP:
+  case MT_PARAM:
+  case MT_TEMP:
+  case MT_POWER:
+  case MT_DIG_INPUTS:
+  case MT_GET_MES:
+  default:
+    //TODO: proceed Error incompatible message type
+    AddAnsMessage(outbuffer, -1);
+    //////////////////////////////////
+  }
+
+   in_message_pid_ = mes->pid;
 
   //TODO: proceed OK Ans
   if (mes->flags & 0x80)

@@ -7,13 +7,13 @@
 #include "Parser.h"
 #include "../common/dllexport_types.h"
 
-__declspec(dllexport) void CALLBACK init()
+extern "C" __declspec(dllexport) void CALLBACK init()
 {
   ///force DBInterface creation
   parser::CDBInterface::Instance();
 }
 
-__declspec(dllexport) void CALLBACK close()
+extern "C" __declspec(dllexport) void CALLBACK close()
 {
 }
 

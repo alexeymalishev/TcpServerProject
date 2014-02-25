@@ -85,6 +85,8 @@ private:
 	/// thread terminate flag
 	bool m_bTerminate;
 
+  HANDLE stopTh;
+
 	/// Pointer to command strings for writing
 	bool m_bActiveCommandStr;
 

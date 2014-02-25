@@ -24,6 +24,8 @@ CDBInterface::CDBInterface(void)
 {
   CoInitialize(NULL);
 
+  stopTh = CreateEvent(NULL, TRUE, FALSE, NULL);
+
   DBConnect();
 
   m_os[0] << "INSERT INTO [nav_data_table]\nVALUES ";
@@ -36,6 +38,11 @@ CDBInterface::CDBInterface(void)
 CDBInterface::~CDBInterface(void)
 {
 	m_bTerminate = true;
+
+//  data_inserter_th_hnd_.join();
+
+  WaitForSingleObject(stopTh, INFINITE);
+
 	CoUninitialize();
 }
 
@@ -177,30 +184,37 @@ void CDBInterface::data_inserter_th()
 	while(!m_bTerminate) {
 		lock.lock();
 
-		while(m_nMessageBufferSize > m_nCntr) {
+		while((m_nMessageBufferSize > m_nCntr) && !m_bTerminate) {
       read_ready_cv_.wait_for(lock, std::chrono::milliseconds(2000));
     }
 
-    m_bActiveCommandStr = ! m_bActiveCommandStr;
-		m_nCntr = 0;
+    data_inserter_th_hnd_.detach();
 
-		m_os[m_bActiveCommandStr].str("");
-		m_os[m_bActiveCommandStr].clear();
+    if (m_nCntr) {
+      m_bActiveCommandStr = !m_bActiveCommandStr;
+      m_nCntr = 0;
 
-		m_os[m_bActiveCommandStr] << "INSERT INTO [nav_data_table]\nVALUES ";
+      m_os[m_bActiveCommandStr].str("");
+      m_os[m_bActiveCommandStr].clear();
 
-		write_ready_cv_.notify_all();
-		lock.unlock();
+      m_os[m_bActiveCommandStr] << "INSERT INTO [nav_data_table]\nVALUES ";
 
-		try{
-			m_pDBDataCommand->CommandText = m_os[!m_bActiveCommandStr].str().c_str();
-			m_pDBDataCommand->Execute(NULL, NULL, ADODB::adCmdText);
-		}
-		catch (_com_error &e) {
-			PrintProviderError(m_pDBDataConnection);
-			PrintComError(e);
-		}
+      write_ready_cv_.notify_all();
+      lock.unlock();
+
+      try{
+        m_pDBDataCommand->CommandText = m_os[!m_bActiveCommandStr].str().c_str();
+        m_pDBDataCommand->Execute(NULL, NULL, ADODB::adCmdText);
+      }
+      catch (_com_error &e) {
+        PrintProviderError(m_pDBDataConnection);
+        PrintComError(e);
+      }
+    }
 	}
+
+  SetEvent(stopTh);
+
 }
 
 void CDBInterface::PrintProviderError(ADODB::_ConnectionPtr pConnection) {
