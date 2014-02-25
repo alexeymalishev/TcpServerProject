@@ -31,14 +31,14 @@ private:
   const char kReplaceEndToken_ = 'b';
 
   ///TODO: check crc
-  const uint16_t kCRC_ok_ = 0xB029;
+  const uint16_t kCRC_ok_ = 0xF0B8;
 
   const uint8_t kProtocolVersion_ = 1;
   const size_t kMessageHeaderSize_ = 13;
 
   const uint16_t kTransmissionPeriod = 10;
 
-  //const static unsigned short Crc16Table[256];
+  const static unsigned short Crc16Table[256];
 
   uint32_t device_id_;
   uint32_t state_;
@@ -62,14 +62,7 @@ private:
 
   inline void crc16(char ch)
   {
-    ///TODO: change crc algorithm to table metod
-    //crc_ = (crc_ >> 8) ^ Crc16Table[(crc_ >> 8) ^ (ch & 0xff)];
-
-    crc_ ^= (ch & 0xff);
-    for (int ii = 8; ii > 0; --ii)
-    {
-      crc_ = (crc_ & 0x01) ? (crc_ >> 1) ^ 0x8408 : crc_ >> 1;
-    }
+    crc_ = (crc_ >> 8) ^ Crc16Table[(crc_ >> 8) ^ (ch & 0xff)];
   }
 
   void Process(tcpserver::outbuffer_ptr& buf_list);
