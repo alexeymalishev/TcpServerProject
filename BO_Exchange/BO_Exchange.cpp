@@ -15,6 +15,7 @@ extern "C" __declspec(dllexport) void CALLBACK init()
 
 extern "C" __declspec(dllexport) void CALLBACK close()
 {
+  const_cast<parser::CDBInterface&>(parser::CDBInterface::Instance()).Close();
 }
 
 __declspec(dllexport) void CALLBACK registrate_server(const std::weak_ptr<tcpserver::IServer> srv)

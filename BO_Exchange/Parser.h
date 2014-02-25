@@ -62,7 +62,7 @@ private:
 
   inline void crc16(char ch)
   {
-    crc_ = (crc_ >> 8) ^ Crc16Table[(crc_ >> 8) ^ (ch & 0xff)];
+    crc_ = (crc_ >> 8) ^ Crc16Table[(crc_ ^ ch) & 0xff];
   }
 
   void Process(tcpserver::outbuffer_ptr& buf_list);

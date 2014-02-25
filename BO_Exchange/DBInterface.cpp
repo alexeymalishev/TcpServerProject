@@ -24,8 +24,6 @@ CDBInterface::CDBInterface(void)
 {
   CoInitialize(NULL);
 
-  stopTh = CreateEvent(NULL, TRUE, FALSE, NULL);
-
   DBConnect();
 
   m_os[0] << "INSERT INTO [nav_data_table]\nVALUES ";
@@ -37,13 +35,15 @@ CDBInterface::CDBInterface(void)
 
 CDBInterface::~CDBInterface(void)
 {
-	m_bTerminate = true;
+}
 
-//  data_inserter_th_hnd_.join();
+void CDBInterface::Close()
+{
+  m_bTerminate = true;
 
-  WaitForSingleObject(stopTh, INFINITE);
+  data_inserter_th_hnd_.join();
 
-	CoUninitialize();
+  CoUninitialize();
 }
 
 void CDBInterface::DBConnect()
@@ -188,9 +188,7 @@ void CDBInterface::data_inserter_th()
       read_ready_cv_.wait_for(lock, std::chrono::milliseconds(2000));
     }
 
-    data_inserter_th_hnd_.detach();
-
-    if (m_nCntr) {
+ //   if (m_nCntr) {
       m_bActiveCommandStr = !m_bActiveCommandStr;
       m_nCntr = 0;
 
@@ -210,10 +208,8 @@ void CDBInterface::data_inserter_th()
         PrintProviderError(m_pDBDataConnection);
         PrintComError(e);
       }
-    }
+   // }
 	}
-
-  SetEvent(stopTh);
 
 }
 

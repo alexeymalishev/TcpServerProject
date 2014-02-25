@@ -37,6 +37,8 @@ public:
   void PushFirmwareData(const uint32_t nDeviceId, uint8_t* data) const;
   void PushLogMessage(const uint32_t nDeviceId, int ec, std::string message) const;
 
+  void Close();
+
 private:
   CDBInterface(void);
 
@@ -84,8 +86,6 @@ private:
 
 	/// thread terminate flag
 	bool m_bTerminate;
-
-  HANDLE stopTh;
 
 	/// Pointer to command strings for writing
 	bool m_bActiveCommandStr;
