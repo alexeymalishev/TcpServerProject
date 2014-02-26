@@ -169,17 +169,16 @@ tcpserver::outbuffer_ptr CParser::Parse(boost::weak_ptr<tcpserver::Connection> c
 
 void CParser::AddAnsMessage(tcpserver::outbuffer_ptr& outbuffer, int16_t ec)
 {
-  size_t message_size = kMessageHeaderSize_ + 4;
+  auto message_size = kMessageHeaderSize_ + 4 - 2;
 
-  size_t head_ptr = outbuffer->size();
-  outbuffer->resize(head_ptr + message_size);
-  Message* mes = reinterpret_cast<Message*>(outbuffer->data() + head_ptr);
+  std::unique_ptr<char> tmpBuf(new char[message_size]);
+  Message* mes = reinterpret_cast<Message*>(tmpBuf.get());
 
   mes->device_id = 0;
   mes->flags = 0x80;
   mes->length = message_size;
   mes->pid = out_message_pid_++;
-  mes->type = MT_PARAM;
+  mes->type = MT_ANS;
   mes->protocol_version = kProtocolVersion_;
 
   uint8_t* mesData = &mes->data;
@@ -190,33 +189,35 @@ void CParser::AddAnsMessage(tcpserver::outbuffer_ptr& outbuffer, int16_t ec)
   mesData[2] = ec & 0xFF;
   mesData[3] = ec >> 8;
 
-  //TODO: check crc compute and function
+  outbuffer->push_back(kStartToken_);
 
   crc_ = 0xFFFF;
 
-  for (size_t ii = 0; ii < message_size - 2; ++ii) {
-    crc16(outbuffer->data()[head_ptr + ii]);
+  for (size_t ii = 0; ii < message_size; ++ii) {
+    crc16(tmpBuf.get()[ii]);
+    pushout(outbuffer, tmpBuf.get()[ii]);
   }
 
   crc_ = ~crc_;
 
-  mesData[message_size - 2] = crc_ & 0xFF;
-  mesData[message_size - 1] = crc_ >> 8;
+  pushout(outbuffer, crc_ & 0xFF);
+  pushout(outbuffer, crc_ >> 8);
+
+  outbuffer->push_back(kEndToken_);
 } // void CParser::AddErrorMessage
 
 void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags, uint8_t code, uint8_t lenght, uint8_t const * const data)
 {
-  auto message_size = kMessageHeaderSize_ + 5 + lenght;
-
-  size_t head_ptr = outbuffer->size();
-  outbuffer->resize(head_ptr + message_size);
-  Message* mes = reinterpret_cast<Message*>(outbuffer->data() + head_ptr);
+  auto message_size = kMessageHeaderSize_ + 3 + lenght - 2;
+  
+  std::unique_ptr<char> tmpBuf(new char[message_size]);
+  Message* mes = reinterpret_cast<Message*>(tmpBuf.get());
 
   mes->device_id = 0;
   mes->flags = 0;
   mes->length = message_size;
   mes->pid = out_message_pid_++;
-  mes->type = MT_ANS;
+  mes->type = MT_PARAM;
   mes->protocol_version = kProtocolVersion_;
 
   uint8_t* mesData = &mes->data;
@@ -227,18 +228,21 @@ void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags
 
   memcpy(mesData + 3, data, lenght);
 
-  //TODO: check crc compute and function
+  outbuffer->push_back(kStartToken_);
 
   crc_ = 0xFFFF;
 
-  for (size_t ii = 0; ii < message_size - 2; ++ii) {
-    crc16(outbuffer->data()[head_ptr + ii]);
+  for (size_t ii = 0; ii < kMessageHeaderSize_; ++ii) {
+    crc16(tmpBuf.get()[ii]);
+    pushout(outbuffer, tmpBuf.get()[ii]);
   }
 
   crc_ = ~crc_;
 
-  mesData[message_size - 2] = crc_ & 0xFF;
-  mesData[message_size - 1] = crc_ >> 8;
+  pushout(outbuffer, crc_ & 0xFF);
+  pushout(outbuffer, crc_ >> 8);
+
+  outbuffer->push_back(kEndToken_);
 
 } // void CParser::AddParamMessage
 

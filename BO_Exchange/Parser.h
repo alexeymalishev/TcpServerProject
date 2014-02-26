@@ -65,6 +65,29 @@ private:
     crc_ = (crc_ >> 8) ^ Crc16Table[(crc_ ^ ch) & 0xff];
   }
 
+  inline void pushout(tcpserver::outbuffer_ptr& outbuffer, const char& ch)
+  {
+    if (ch == kStartToken_)
+    {
+      outbuffer->push_back(kReplaceToken_);
+      outbuffer->push_back(kReplaceStartToken_);
+    }
+    else if (ch == kEndToken_)
+    {
+      outbuffer->push_back(kReplaceToken_);
+      outbuffer->push_back(kReplaceEndToken_);
+    }
+    else if (ch == kReplaceToken_)
+    {
+      outbuffer->push_back(kReplaceToken_);
+      outbuffer->push_back(kReplaceToken_);
+    }
+    else
+    {
+      outbuffer->push_back(ch);
+    }
+  }
+
   void Process(tcpserver::outbuffer_ptr& buf_list);
   void AddAnsMessage(tcpserver::outbuffer_ptr& buf_list, int16_t ec);
   void AddParamMessage(tcpserver::outbuffer_ptr& buf_list, uint8_t flags, uint8_t code, uint8_t lenght, uint8_t const * const data);
