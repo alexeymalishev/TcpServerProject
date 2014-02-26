@@ -232,7 +232,7 @@ void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags
 
   crc_ = 0xFFFF;
 
-  for (size_t ii = 0; ii < kMessageHeaderSize_; ++ii) {
+  for (size_t ii = 0; ii < message_size; ++ii) {
     crc16(tmpBuf.get()[ii]);
     pushout(outbuffer, tmpBuf.get()[ii]);
   }
