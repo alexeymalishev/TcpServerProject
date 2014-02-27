@@ -176,7 +176,7 @@ void CParser::AddAnsMessage(tcpserver::outbuffer_ptr& outbuffer, int16_t ec)
 
   mes->device_id = 0;
   mes->flags = 0x80;
-  mes->length = message_size;
+  mes->length = message_size + 2;
   mes->pid = out_message_pid_++;
   mes->type = MT_ANS;
   mes->protocol_version = kProtocolVersion_;
@@ -215,7 +215,7 @@ void CParser::AddParamMessage(tcpserver::outbuffer_ptr& outbuffer, uint8_t flags
 
   mes->device_id = 0;
   mes->flags = 0;
-  mes->length = message_size;
+  mes->length = message_size + 2;
   mes->pid = out_message_pid_++;
   mes->type = MT_PARAM;
   mes->protocol_version = kProtocolVersion_;
