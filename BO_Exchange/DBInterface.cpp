@@ -140,7 +140,7 @@ void CDBInterface::PushCoordData(const uint32_t nDeviceId, const CoordMessage* c
 			<< int(msg->speed) << ", "
 			<< int(msg->course) << ", "
 			<< int(msg->alt) << ", "
-			<< int(msg->course) << ", " 
+//			<< int(msg->source) << ", " 
 			<< int(msg->status) << ")\n";
 
 	if(m_nMessageBufferSize <= ++m_nCntr)
