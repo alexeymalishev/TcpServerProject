@@ -2,6 +2,7 @@
 #include "DBInterface.h"
 
 #include <iostream>
+#include <iomanip>
 #include <ostream>
 #include <fstream>
 #include <chrono>
@@ -105,9 +106,14 @@ void CDBInterface::DBConnect()
   }
 }
 
-void CDBInterface::PushCoordData(const uint32_t nDeviceId, uint8_t* data) const
+void CDBInterface::PushCoordData(const uint32_t nDeviceId, const CoordMessage* const msg) const
 {
   std::unique_lock<std::mutex> lock(queue_rwmutex_);
+
+  tm ltime;
+  __time64_t time = msg->time;
+  
+  localtime_s(&ltime, &time);
 
   while(m_nCntr >= m_nMessageBufferSize)
 		write_ready_cv_.wait(lock);
@@ -116,32 +122,32 @@ void CDBInterface::PushCoordData(const uint32_t nDeviceId, uint8_t* data) const
 		m_os[m_bActiveCommandStr] << ", ";
 
   //TODO: place data parser for place data to DB here
-	//m_os[m_bActiveCommandStr] << "("
-	//		<< int(nDeviceId) << ", '"
-	//		<< int(2000 + msg->c_time.year) << "-"
-	//		<< std::setw(2) << std::setfill('0')
-	//		<< int(msg->c_time.month) << "-"
-	//		<< std::setw(2) << std::setfill('0')
-	//		<< int(msg->c_time.day) << "T"
-	//		<< std::setw(2) << std::setfill('0')
-	//		<< int(msg->c_time.hour) << ":"
-	//		<< std::setw(2) << std::setfill('0')
-	//		<< int(msg->c_time.minute) << ":"
-	//		<< std::setw(2) << std::setfill('0')
-	//		<< int(msg->c_time.second) << "', "
-	//		<< int(msg->lat) << ", "
-	//		<< int(msg->lon) << ", "
-	//		<< int(msg->speed) << ", "
-	//		<< int(msg->course) << ", "
-	//		<< int(msg->gasoline) << ", "
-	//		<< int(msg->navstatus) << ", " 
-	//		<< msg->status.status_full << ")\n";
+	m_os[m_bActiveCommandStr] << "("
+			<< int(nDeviceId) << ", '"
+			<< int(1900 + ltime.tm_year) << "-"
+			<< std::setw(2) << std::setfill('0')
+			<< int(ltime.tm_mon) << "-"
+			<< std::setw(2) << std::setfill('0')
+      << int(ltime.tm_mday) << "T"
+			<< std::setw(2) << std::setfill('0')
+      << int(ltime.tm_hour) << ":"
+			<< std::setw(2) << std::setfill('0')
+      << int(ltime.tm_min) << ":"
+			<< std::setw(2) << std::setfill('0')
+      << int(ltime.tm_sec) << "', "
+			<< int(msg->lat) << ", "
+			<< int(msg->lon) << ", "
+			<< int(msg->speed) << ", "
+			<< int(msg->course) << ", "
+			<< int(msg->alt) << ", "
+			<< int(msg->course) << ", " 
+			<< int(msg->status) << ")\n";
 
 	if(m_nMessageBufferSize <= ++m_nCntr)
 		read_ready_cv_.notify_one();
 }
 
-void CDBInterface::PushFirmwareData(const uint32_t nDeviceId, uint8_t* data) const
+void CDBInterface::PushFirmwareData(const uint32_t nDeviceId, const uint8_t* const data) const
 {
   std::stringstream str;
 
@@ -188,7 +194,7 @@ void CDBInterface::data_inserter_th()
       read_ready_cv_.wait_for(lock, std::chrono::milliseconds(2000));
     }
 
- //   if (m_nCntr) {
+    if (m_nCntr) {
       m_bActiveCommandStr = !m_bActiveCommandStr;
       m_nCntr = 0;
 
@@ -196,6 +202,9 @@ void CDBInterface::data_inserter_th()
       m_os[m_bActiveCommandStr].clear();
 
       m_os[m_bActiveCommandStr] << "INSERT INTO [nav_data_table]\nVALUES ";
+
+      //TODO: delete next string after debug
+      BOOST_LOG_TRIVIAL(info) << "DB: " << m_os[!m_bActiveCommandStr].str();
 
       write_ready_cv_.notify_all();
       lock.unlock();
@@ -208,9 +217,8 @@ void CDBInterface::data_inserter_th()
         PrintProviderError(m_pDBDataConnection);
         PrintComError(e);
       }
-   // }
+    }
 	}
-
 }
 
 void CDBInterface::PrintProviderError(ADODB::_ConnectionPtr pConnection) {
@@ -240,7 +248,7 @@ void CDBInterface::PrintComError(_com_error &e) {
    BOOST_LOG_TRIVIAL(error) << "Description = " << (LPCSTR) bstrDescription;
 } // void CDBInterface::PrintComError
 
-void CDBInterface::PushLogMessage(const uint32_t nDeviceId, int ec, std::string message) const
+void CDBInterface::PushLogMessage(const uint32_t nDeviceId, int ec, const std::string& message) const
 {
   //TODO: place here DB log message procedure
 } // void CDBInterface::PushLogMessage

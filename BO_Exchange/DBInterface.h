@@ -16,6 +16,8 @@
 //#include <boost\thread\mutex.hpp>
 //#include <boost\circular_buffer.hpp>
 
+#include "Message.h"
+
 #import "c:\Program Files (x86)\Common Files\System\ado\msado15.dll" rename("EOF", "EndOfFile")
 
 namespace parser {
@@ -33,9 +35,9 @@ public:
   }
 
 	/// function for pushing data to message queue for waiting inserting to db
-	void PushCoordData(const uint32_t nDeviceId, uint8_t* data) const;
-  void PushFirmwareData(const uint32_t nDeviceId, uint8_t* data) const;
-  void PushLogMessage(const uint32_t nDeviceId, int ec, std::string message) const;
+  void PushCoordData(const uint32_t nDeviceId, const CoordMessage* const msg) const;
+  void PushFirmwareData(const uint32_t nDeviceId, const uint8_t* const data) const;
+  void PushLogMessage(const uint32_t nDeviceId, int ec, const std::string& message) const;
 
   void Close();
 

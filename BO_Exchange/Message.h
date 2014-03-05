@@ -27,6 +27,19 @@ enum MessageTypes
   MT_GET_MES    = 0x0A,
 };
 
+#pragma pack(push, 1)
+struct CoordMessage{
+  uint32_t time;
+  int32_t  lat;
+  int32_t  lon;
+  int16_t  alt;
+  uint16_t speed;
+  uint16_t course;
+  uint8_t  source;
+  uint8_t  status;
+};
+#pragma pack(pop)
+
 class CMessage : private boost::noncopyable
 {
 protected:

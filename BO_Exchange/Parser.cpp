@@ -322,7 +322,7 @@ void CParser::Process(tcpserver::outbuffer_ptr& outbuffer)
   {
   case MT_COORDS:
   {
-    parser::CDBInterface::Instance().PushCoordData(device_id_, &mes->data);
+    parser::CDBInterface::Instance().PushCoordData(device_id_, reinterpret_cast<CoordMessage*>(&mes->data));
   }
     break;
   case MT_FIRMWARE:
