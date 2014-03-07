@@ -36,6 +36,7 @@ CDBInterface::CDBInterface(void)
 
 CDBInterface::~CDBInterface(void)
 {
+  CoUninitialize();
 }
 
 void CDBInterface::Close()
@@ -44,7 +45,9 @@ void CDBInterface::Close()
 
   data_inserter_th_hnd_.join();
 
-  CoUninitialize();
+  m_pDBDataConnection->Release();
+
+  m_pDBDataConnection->Close();
 }
 
 void CDBInterface::DBConnect()
@@ -69,7 +72,7 @@ void CDBInterface::DBConnect()
 
     _bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=" + bstrServer + ";Initial Catalog=" + bstrDBName + ";Integrated Security=" + bstrDBSecurity + ";";
 
-//    _bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=NPO-15\\SQLEXPRESS;Initial Catalog=coord_base;Integrated Security=SSPI;";
+    //_bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=NPO-15\\SQLEXPRESS;Initial Catalog=coord_base;Integrated Security=SSPI;";
 
     BOOST_LOG_TRIVIAL(info) << "trying to connect to " << (LPSTR) bstrConnection;
 
@@ -85,17 +88,17 @@ void CDBInterface::DBConnect()
     m_pDBDataCommand->ActiveConnection = m_pDBDataConnection;
 
     /// 
-    TESTHR(m_pDBTextConnection.CreateInstance(__uuidof(ADODB::Connection)));
+    //TESTHR(m_pDBTextConnection.CreateInstance(__uuidof(ADODB::Connection)));
 
-    m_pDBTextConnection->CommandTimeout = 10;
-    m_pDBTextConnection->Open(bstrConnection, bstrDPUsername, bstrDBPaswd, ADODB::adConnectUnspecified);
-    //m_pDBTextConnection->Open(bstrConnection, "", "", ADODB::adConnectUnspecified);
+    //m_pDBTextConnection->CommandTimeout = 10;
+    //m_pDBTextConnection->Open(bstrConnection, bstrDPUsername, bstrDBPaswd, ADODB::adConnectUnspecified);
+    ////m_pDBTextConnection->Open(bstrConnection, "", "", ADODB::adConnectUnspecified);
 
-	    // Create command object.
-    TESTHR(m_pDBTextCommand.CreateInstance(__uuidof(ADODB::Command)));
-    m_pDBTextCommand->ActiveConnection = m_pDBTextConnection;
+	   // // Create command object.
+    //TESTHR(m_pDBTextCommand.CreateInstance(__uuidof(ADODB::Command)));
+    //m_pDBTextCommand->ActiveConnection = m_pDBTextConnection;
 
-    BOOST_LOG_TRIVIAL(info) << "db connection ok\n";
+    BOOST_LOG_TRIVIAL(info) << "db connection ok";
   }
   catch (_com_error &e) {
     PrintProviderError(m_pDBDataConnection);
