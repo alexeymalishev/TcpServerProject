@@ -9,7 +9,7 @@ class CParser : public tcpserver::IParser
 {
 public:
   CParser();
-  ~CParser();
+  virtual ~CParser();
 
   virtual tcpserver::outbuffer_ptr Parse(boost::weak_ptr<tcpserver::Connection> connection_ptr,
                                         tcpserver::InArrayIterator in_data_start,

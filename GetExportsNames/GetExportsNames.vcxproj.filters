@@ -49,4 +49,7 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Release\TcpSrvService.exe" />
+  </ItemGroup>
 </Project>

@@ -25,5 +25,5 @@ __declspec(dllexport) void CALLBACK registrate_server(const std::weak_ptr<tcpser
 
 __declspec(dllexport) std::unique_ptr<tcpserver::IParser> CALLBACK parser_fabric()
 {
-  return std::unique_ptr<tcpserver::IParser>(new CParser());
+  return std::move(std::unique_ptr<tcpserver::IParser>(new CParser()));
 }

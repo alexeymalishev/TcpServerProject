@@ -46,7 +46,6 @@ void CDBInterface::Close()
   data_inserter_th_hnd_.join();
 
   m_pDBDataConnection->Release();
-
   m_pDBDataConnection->Close();
 }
 
@@ -72,8 +71,6 @@ void CDBInterface::DBConnect()
 
     _bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=" + bstrServer + ";Initial Catalog=" + bstrDBName + ";Integrated Security=" + bstrDBSecurity + ";";
 
-    //_bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=NPO-15\\SQLEXPRESS;Initial Catalog=coord_base;Integrated Security=SSPI;";
-
     BOOST_LOG_TRIVIAL(info) << "trying to connect to " << (LPSTR) bstrConnection;
 
     /// 
@@ -81,7 +78,6 @@ void CDBInterface::DBConnect()
 
     m_pDBDataConnection->CommandTimeout = 10;
     m_pDBDataConnection->Open(bstrConnection, bstrDPUsername, bstrDBPaswd, ADODB::adConnectUnspecified);
-    //m_pDBDataConnection->Open(bstrConnection, "", "", ADODB::adConnectUnspecified);
 
 	    // Create command object.
     TESTHR(m_pDBDataCommand.CreateInstance(__uuidof(ADODB::Command)));
@@ -103,9 +99,11 @@ void CDBInterface::DBConnect()
   catch (_com_error &e) {
     PrintProviderError(m_pDBDataConnection);
     PrintComError(e);
+    throw;
   }
   catch(std::exception& e) {
      BOOST_LOG_TRIVIAL(error) << e.what();
+     throw;
   }
 }
 
