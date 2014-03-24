@@ -22,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		common\parameters.h = common\parameters.h
 		Release\SrvCfg.exe = Release\SrvCfg.exe
 		Release\TcpServerEventMsg.dll = Release\TcpServerEventMsg.dll
-		Release\TcpSrv.exe = Release\TcpSrv.exe
 		Release\TcpSrvService.exe = Release\TcpSrvService.exe
 	EndProjectSection
 EndProject
