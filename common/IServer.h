@@ -38,14 +38,14 @@ public:
 	virtual ~IServer() {};
 
     /// Send message by connection pointer callback, check connection existance
-    virtual bool data_send(boost::weak_ptr<Connection> connection_ptr,
+    virtual bool DataSend(boost::weak_ptr<Connection> connection_ptr,
                            outbuffer_ptr out_buffer_list) = 0;
 
     /// close connection by pointer callback, check connection existance
-    virtual bool close_connection(boost::weak_ptr<Connection> connection_ptr) =0;
+    virtual bool CloseConnection(boost::weak_ptr<Connection> connection_ptr) =0;
 
     /// try to open connection from library
-    virtual void open_connection(const open_connection_callback callback,
+    virtual void OpenConnection(const open_connection_callback callback,
                                  const std::string &address,
                                  const std::string &port,
                                  const int &connection_id) = 0;

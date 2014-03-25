@@ -30,7 +30,7 @@ CDBInterface::CDBInterface(void)
   m_os[0] << "INSERT INTO [nav_data_table]\nVALUES ";
   m_os[1] << "INSERT INTO [nav_data_table]\nVALUES ";
 
-  data_inserter_th_hnd_ = std::thread(&CDBInterface::data_inserter_th, this);
+  data_inserter_th_hnd_ = std::thread(&CDBInterface::DataInserterTh, this);
 }
 
 
@@ -47,6 +47,9 @@ void CDBInterface::Close()
 
   m_pDBDataConnection->Release();
   m_pDBDataConnection->Close();
+
+  //m_pDBTextCommand->Release();
+  //m_pDBTextCommand->Close();
 }
 
 void CDBInterface::DBConnect()
@@ -54,19 +57,19 @@ void CDBInterface::DBConnect()
   try {
     std::string sTmpStr;
 
-    Parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\Parameters", "DBPasswd", &sTmpStr);
+    parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\parameters", "DBPasswd", &sTmpStr);
     _bstr_t bstrDBPaswd = sTmpStr.c_str();
 
-    Parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\Parameters", "DBUserName", &sTmpStr);
+    parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\parameters", "DBUserName", &sTmpStr);
     _bstr_t bstrDPUsername = sTmpStr.c_str();
 	
-    Parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\Parameters", "DBServerName", &sTmpStr);
+    parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\parameters", "DBServerName", &sTmpStr);
     _bstr_t bstrServer = sTmpStr.c_str();
 	
-    Parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\Parameters", "DBName", &sTmpStr);
+    parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\parameters", "DBName", &sTmpStr);
     _bstr_t bstrDBName = sTmpStr.c_str();
 
-    Parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\Parameters", "DBSecurity", &sTmpStr);
+    parameters::GetParam("System\\CurrentControlSet\\Services\\TcpServer\\parameters", "DBSecurity", &sTmpStr);
     _bstr_t bstrDBSecurity = sTmpStr.c_str();
 
     _bstr_t bstrConnection = "Provider=SQLOLEDB;Data Source=" + bstrServer + ";Initial Catalog=" + bstrDBName + ";Integrated Security=" + bstrDBSecurity + ";";
@@ -182,7 +185,7 @@ void CDBInterface::PushFirmwareData(const uint32_t nDeviceId, const uint8_t* con
 //		}
 }
 
-void CDBInterface::data_inserter_th()
+void CDBInterface::DataInserterTh()
 {
   std::unique_lock<std::mutex> lock(queue_rwmutex_);
 
@@ -203,9 +206,6 @@ void CDBInterface::data_inserter_th()
       m_os[m_bActiveCommandStr].clear();
 
       m_os[m_bActiveCommandStr] << "INSERT INTO [nav_data_table]\nVALUES ";
-
-      //TODO: delete next string after debug
-      BOOST_LOG_TRIVIAL(info) << "DB: " << m_os[!m_bActiveCommandStr].str();
 
       write_ready_cv_.notify_all();
       lock.unlock();

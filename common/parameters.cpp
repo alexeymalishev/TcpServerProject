@@ -10,7 +10,7 @@
 #include <sstream>
 #include "parameters.h"
 
-namespace Parameters
+namespace parameters
 {
 
 HKEY OpenKey(const std::string& lpKey)
@@ -71,7 +71,7 @@ HKEY CreateKey(const std::string& lpKey)
         int sz = 256;
 
         FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, 0, res, 0, buf, sz, 0);
-        sErrMessage << "Registry key " << lpKey << "\\Parameters Error " << buf;
+        sErrMessage << "Registry key " << lpKey << "\\parameters Error " << buf;
 
         throw std::exception(sErrMessage.str().c_str());
     }
@@ -218,5 +218,5 @@ void SetParam(const std::string& lpKey, const std::string& lpVal, const DWORD &n
     }
 }
 
-} //namespace Parameters
+} //namespace parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////

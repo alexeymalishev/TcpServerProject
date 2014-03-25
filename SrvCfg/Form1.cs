@@ -26,8 +26,8 @@ namespace SrvCfg
             try
             {
                 Microsoft.Win32.RegistryKey key;
-                key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters");
-                //key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters");
+                key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters");
+                //key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters");
 
                 if (null != key)
                 {
@@ -37,8 +37,8 @@ namespace SrvCfg
 
                     for (int ii = 0; ii < nNumberOfParsers; ++ii)
                     {
-                        key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters\\Parser_" + ii);
-                        //key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters\\Parser_" + ii);
+                        key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters\\Parser_" + ii);
+                        //key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters\\Parser_" + ii);
                         if (null != key)
                         {
                             string lpValue;
@@ -65,7 +65,7 @@ namespace SrvCfg
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("Section HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\TcpServer\\Parameters not exist", "Registry error",
+                    System.Windows.Forms.MessageBox.Show("Section HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\TcpServer\\parameters not exist", "Registry error",
                         System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 }
 
@@ -195,8 +195,8 @@ namespace SrvCfg
         private void btnOk_Click(object sender, EventArgs e)
         {
             Microsoft.Win32.RegistryKey key;
-            key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters");
-            //key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters");
+            key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters");
+            //key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters");
 
             key.SetValue("NumberOfParsers", listViewParsers.Items.Count);
 
@@ -204,8 +204,8 @@ namespace SrvCfg
 
             for (int ii = 0; ii < listViewParsers.Items.Count; ++ii)
             {
-                key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters\\Parser_" + ii);
-                //key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\Parameters\\Parser_" + ii);
+                key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters\\Parser_" + ii);
+                //key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("System\\CurrentControlSet\\Services\\TcpServer\\parameters\\Parser_" + ii);
 
                 key.SetValue("Protocol", listViewParsers.Items[ii].Text);
                 key.SetValue("PortNumber", listViewParsers.Items[ii].SubItems[1].Text);

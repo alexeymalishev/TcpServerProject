@@ -20,7 +20,7 @@
 
 #include <string>
 
-namespace Parameters
+namespace parameters
 {
 
 // GetParam
@@ -32,6 +32,6 @@ namespace Parameters
   void SetParam(const std::string& lpKey, const std::string& lpVal, const std::string& sData);
   void SetParam(const std::string& lpKey, const std::string& lpVal, const DWORD& nParam);
 
-} //namespace Parameters
+} //namespace parameters
 
 #endif

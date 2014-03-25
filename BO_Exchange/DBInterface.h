@@ -12,9 +12,6 @@
 #include <condition_variable>
 #include <sstream>
 #include <boost\noncopyable.hpp>
-//#include <boost\thread.hpp>
-//#include <boost\thread\mutex.hpp>
-//#include <boost\circular_buffer.hpp>
 
 #include "Message.h"
 
@@ -45,7 +42,7 @@ private:
   CDBInterface(void);
 
 	/// data inserter thread procedure
-	void data_inserter_th();
+	void DataInserterTh();
 
 	/// connection to database procedure
 	void DBConnect();
