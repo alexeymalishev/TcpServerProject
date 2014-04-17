@@ -1,0 +1,103 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+//#include "afxres.h"
+
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""windows.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CMDLINE_EOPENSCM_AD "Can not open SCM. Access denide."
+    IDS_CMDLINE_EOPENSCM    "Can not open SCM. "
+    IDS_CMDLINE_ECREATE_DUPNAME "Can not create servise. Dup name."
+    IDS_CMDLINE_ECREATE_EXISTS "Can not create service. Service exists."
+    IDS_CMDLINE_ECREATE     "Can not create service."
+    IDS_CMDLINE_EOPENSERV   "Can not open service."
+    IDS_CMDLINE_ELOAD_DESC  "Can not load description."
+    IDS_CMDLINE_EOPEN_SERVKEY 
+                            "Can not open key HKLM\\System\\CurrentControlSet\\Services\\TcpServer."
+    IDS_CMDLINE_EWRITE_DESC "Can not write description."
+    IDS_CMDLINE_ECREATE_LOGKEY 
+                            "Can not create key HKLM\\System\\CurrentControlSet\\Services\\Eventlog\\Application\\TcpServerEventSource."
+    IDS_CMDLINE_EWRITE_LOG  "Can not write path to message file in to log key."
+    IDS_CMDLINE_EOPEN_LOGKEY 
+                            "Can not open key HKLM\\System\\CurrentControlSet\\Services\\Eventlog\\Application."
+    IDS_CMDLINE_EDELETE_LOG "Can not delete key HKLM\\System\\CurrentControlSet\\Services\\Eventlog\\Application\\TcpServerEventSource."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CMDLINE_MCREATE     "Service created."
+    IDS_CMDLINE_MDELETE     "Service deleted."
+    IDS_CMDLINE_MHELP       "Command line keys: /INSTALL, /UNINSTALL."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DESCRIPTION         "TCP server for listen TCP ports and processing incoming data"
+END
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
