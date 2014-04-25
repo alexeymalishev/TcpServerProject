@@ -195,7 +195,8 @@ void CDBInterface::DataInserterTh()
 		lock.lock();
 
 		while((m_nMessageBufferSize > m_nCntr) && !m_bTerminate) {
-      read_ready_cv_.wait_for(lock, std::chrono::milliseconds(2000));
+      if (std::cv_status::timeout == read_ready_cv_.wait_for(lock, std::chrono::milliseconds(2000)))
+        break;
     }
 
     if (m_nCntr) {
